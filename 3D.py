@@ -17,10 +17,10 @@ game_paused = False
 enemies_paused = False
 enemy_fire_paused = False
 
-bullets = []  # [x, y, z, angle]
-ufos = []     # [x, y, z, landed]
-enemy_fireballs = []  # UFO bullets
-powerups = []  # [x, y, z, type]
+bullets = [] 
+ufos = []     
+enemy_fireballs = []  
+powerups = []
 score = 0
 lives = 3
 game_over = False
@@ -65,7 +65,7 @@ time_clone = {
     "positions": [],
     "current_step": 0,
     "cooldown": 0,
-    "duration": 300  # 10 seconds at 30fps
+    "duration": 300  
 }
 
 frame_count = 0
@@ -111,9 +111,9 @@ def update_mothership():
     if not mothership["active"] or game_paused:
         return
     
-    # Phase-based behavior
+   
     if mothership["phase"] == 1:
-        # Shielded phase - spawn minions
+      
         mothership["minion_spawn_timer"] -= 1
         if mothership["minion_spawn_timer"] <= 0:
             ufos.append([mothership["x"] + random.randint(-100, 100),
@@ -121,7 +121,7 @@ def update_mothership():
                          mothership["z"] - 50, False])
             mothership["minion_spawn_timer"] = 100
         
-        # Learn player patterns
+       
         if len(bullets) > 0:
             last_bullet = bullets[-1]
             angle = last_bullet[3]
@@ -129,13 +129,13 @@ def update_mothership():
             if len(mothership["pattern_memory"]) > 10:
                 mothership["pattern_memory"].pop(0)
             
-            # Dodge if pattern recognized
+       
             if mothership["pattern_memory"].count(angle) > 3 and frame_count - mothership["last_dodge_time"] > 60:
                 mothership["x"] += random.choice([-150, 150])
                 mothership["y"] += random.choice([-150, 150])
                 mothership["last_dodge_time"] = frame_count
         
-        # Move toward player but maintain distance
+        
         dx = player_pos[0] - mothership["x"]
         dy = player_pos[1] - mothership["y"]
         dist = math.hypot(dx, dy)
@@ -146,13 +146,13 @@ def update_mothership():
             mothership["x"] -= dx * 0.01
             mothership["y"] -= dy * 0.01
         
-        # Check for phase transition
+
         if mothership["health"] < 700:
             mothership["phase"] = 2
             mothership["shield"] = False
     
     elif mothership["phase"] == 2:
-        # Aggressive phase - chase player and fire frequently
+    
         dx = player_pos[0] - mothership["x"]
         dy = player_pos[1] - mothership["y"]
         mothership["x"] += dx * 0.02
@@ -162,15 +162,16 @@ def update_mothership():
         if random.random() < 0.03:
             enemy_fireballs.append([mothership["x"], mothership["y"], mothership["z"]])
         
-        # Phase transition
+  
         if mothership["health"] < 300:
             mothership["phase"] = 3
+            
             # Split into 3 smaller UFOs
             for _ in range(3):
                 ufos.append([mothership["x"], mothership["y"], mothership["z"], False])
             mothership["active"] = False
     
-    # Descend slowly
+   
     if mothership["z"] > 200:
         mothership["z"] -= 0.5
 
@@ -181,19 +182,19 @@ def draw_mothership():
     glPushMatrix()
     glTranslatef(mothership["x"], mothership["y"], mothership["z"])
     
-    # Phase-based appearance
+
     if mothership["phase"] == 1:
-        glColor3f(0.8, 0.2, 0.8)  # Purple with shield
+        glColor3f(0.8, 0.2, 0.8)  # Purple 
         if mothership["shield"]:
             glColor4f(0.8, 0.2, 0.8, 0.3)
             glutWireSphere(60, 16, 16)
             glColor3f(0.8, 0.2, 0.8)
     elif mothership["phase"] == 2:
-        glColor3f(1, 0.1, 0.1)  # Red when aggressive
+        glColor3f(1, 0.1, 0.1)  #RED
     
     glutSolidSphere(40, 20, 20)
     
-    # Health indicator
+    # Health ind
     glColor3f(1, 0, 0)
     glBegin(GL_LINES)
     glVertex3f(-40, -50, 0)
@@ -207,10 +208,10 @@ def record_player_movement():
     if time_clone["cooldown"] > 0:
         return
     
-    # Record current position and angle
+  
     time_clone["positions"].append([player_pos[0], player_pos[1], player_pos[2], gun_angle])
     
-    # Keep only the last 10 seconds of data
+
     if len(time_clone["positions"]) > time_clone["duration"]:
         time_clone["positions"].pop(0)
 
@@ -218,7 +219,7 @@ def activate_time_clone():
     if time_clone["cooldown"] <= 0 and len(time_clone["positions"]) >= time_clone["duration"]:
         time_clone["active"] = True
         time_clone["current_step"] = 0
-        time_clone["cooldown"] = 900  # 30 second cooldown
+        time_clone["cooldown"] = 900  
 
 def update_time_clone():
     if time_clone["cooldown"] > 0:
@@ -239,10 +240,10 @@ def draw_time_clone():
         clone_data = time_clone["positions"][time_clone["current_step"]]
         glPushMatrix()
         glTranslatef(clone_data[0], clone_data[1], clone_data[2])
-        glColor4f(0, 1, 1, 0.7)  # Semi-transparent cyan
+        glColor4f(0, 1, 1, 0.7)  
         glutSolidCube(40)
         
-        # Draw clone's gun
+        # Draw clone gun
         glColor4f(0, 0, 1, 0.7)
         glRotatef(clone_data[3], 0, 0, 1)
         glTranslatef(20, 0, 20)
@@ -250,7 +251,7 @@ def draw_time_clone():
         gluCylinder(gluNewQuadric(), 5, 5, 40, 10, 10)
         glPopMatrix()
 
-# Enemy Management
+# Enemy 
 def spawn_ufo():
     x = random.randint(-GRID_LIMIT+50, GRID_LIMIT-50)
     y = random.randint(-GRID_LIMIT+50, GRID_LIMIT-50)
@@ -505,7 +506,7 @@ def display():
     draw_text(10, 710, f"Cheat Mode: {'ON' if cheat_mode else 'OFF'}")
     draw_text(10, 680, f"View: {'First Person' if first_person else 'Third Person'}")
     
-    # Power-up status indicators
+    # Power-up status 
     if shield_active:
         draw_text(10, 650, f"Shield: {shield_timer//30} sec")
     if bullet_speed_active:
@@ -547,11 +548,11 @@ def update():
     
     frame_count += 1
     
-    # Spawn systems
+
     if frame_count % SPAWN_INTERVAL == 0 and not enemies_paused:
         spawn_ufo()
     
-    # Mothership spawn
+   
     if score >= 500 and not mothership["active"] and random.random() < 0.01:
         spawn_mothership()
     
@@ -635,7 +636,7 @@ def special(key, x, y):
         return
     
     if key == GLUT_KEY_LEFT: 
-        camera_angle -= 5  # Fixed line - removed 'p'
+        camera_angle -= 5  
     elif key == GLUT_KEY_RIGHT: 
         camera_angle += 5
     elif key == GLUT_KEY_UP:
